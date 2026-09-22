@@ -7,6 +7,8 @@ import { createPool } from "./db/pool.js";
 import { createCatalogReadRepository } from "./db/catalog-read-repository.js";
 import { createApiRouter } from "./routes/index.js";
 import { createCatalogService } from "./services/catalog-service.js";
+import { createLiveCatalogSource } from "./services/live-catalog-source.js";
+import { createEpicClient, createSteamClient } from "./integrations/index.js";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const staticDir = path.join(rootDir, "dist", "client");
@@ -18,7 +20,11 @@ if (config.databaseUrl) {
   catalogRepository = createCatalogReadRepository(pool);
 }
 
-const catalogService = createCatalogService({ repository: catalogRepository });
+const liveSource = catalogRepository ? null : createLiveCatalogSource({
+  steam: createSteamClient({ countryCode: config.steamCountry }),
+  epic: createEpicClient({ locale: config.epicLocale }),
+});
+const catalogService = createCatalogService({ repository: catalogRepository, liveSource });
 const healthCheck = pool
   ? async () => {
       await pool.query("SELECT 1");
