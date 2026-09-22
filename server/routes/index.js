@@ -2,7 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { createCatalogService } from "../services/catalog-service.js";
 
-const storeSchema = z.enum(["all", "steam", "epic"]).default("all");
+const storeSchema = z.enum(["all", "steam", "epic", "both"]).default("all");
 const periodSchema = z.enum(["now", "week", "all-time"]).default("now");
 const pageSchema = z.coerce.number().int().min(1).default(1);
 const limitSchema = z.coerce.number().int().min(1).max(100).default(20);
@@ -49,6 +49,15 @@ export function createApiRouter({ catalogService = createCatalogService(), healt
         limit: limitSchema,
       }).parse(request.query);
       response.json(await catalogService.rankings(query));
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get("/compare", async (request, response, next) => {
+    try {
+      const slugs = z.string().transform((value) => value.split(",").map((slug) => slug.trim()).filter(Boolean)).pipe(z.array(z.string().regex(/^[a-z0-9-]+$/)).min(2).max(3)).parse(request.query.slugs);
+      response.json(await catalogService.compare({ slugs }));
     } catch (error) {
       next(error);
     }

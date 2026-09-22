@@ -1,7 +1,7 @@
 import { mockGames, mockUpdatedAt } from "../mock/games.js";
 
 const storeMatches = (game, store) =>
-  store === "all" || game.stores.some((listing) => listing.store === store);
+  store === "all" || (store === "both" ? ["steam", "epic"].every((name) => game.stores.some((listing) => listing.store === name)) : game.stores.some((listing) => listing.store === store));
 
 function rankingView(game, index, field = "score") {
   return {
@@ -94,6 +94,19 @@ export function createCatalogService({ repository } = {}) {
     async game(slug) {
       const game = (await source.listGames()).find((item) => item.slug === slug);
       return game ? { ...game, updatedAt: mockUpdatedAt } : null;
+    },
+
+    async compare({ slugs = [] } = {}) {
+      const games = await source.listGames();
+      const selected = slugs.map((slug) => games.find((game) => game.slug === slug));
+      if (selected.some((game) => !game)) {
+        const missing = slugs.filter((slug) => !games.some((game) => game.slug === slug));
+        const error = new Error("Jogo não encontrado");
+        error.status = 404;
+        error.details = { missing };
+        throw error;
+      }
+      return { items: selected.map((game) => ({ ...game, updatedAt: mockUpdatedAt })) };
     },
   };
 }
