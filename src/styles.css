@@ -79,3 +79,26 @@ footer { display: flex; align-items: center; gap: 20px; max-width: 1440px; margi
 .catalog-toolbar .store-filter button.selected { color: white; background: var(--blue); box-shadow: 0 4px 12px rgba(8,119,255,.25); }
 .catalog-toolbar .favorites-filter { min-height: 34px; border-radius: 7px; padding-inline: 13px; font-weight: 600; }
 @media (max-width: 720px) { .catalog-toolbar .filter-control { align-items: flex-start; flex-direction: column; }.catalog-toolbar .store-filter { width: 100%; }.catalog-toolbar .store-filter button { flex: 1 1 auto; }.catalog-toolbar .favorites-filter { align-self: flex-start; } }
+
+.select-control { position: relative; }
+.select-control select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  min-width: 180px;
+  border: 1px solid #34404c !important;
+  border-radius: 8px !important;
+  padding: 10px 38px 10px 13px !important;
+  color: #f5f7fa !important;
+  background: #111820 !important;
+  color-scheme: dark;
+  outline: none;
+}
+.select-control select:hover,
+.select-control select:focus {
+  border-color: var(--blue) !important;
+  box-shadow: 0 0 0 3px rgba(8,119,255,.18);
+}
+.select-control select option {
+  color: #f5f7fa;
+  background: #111820;
+}
